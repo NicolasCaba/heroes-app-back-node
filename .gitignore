@@ -1,0 +1,8 @@
+# node modules
+node_modules
+
+# envioroment variables
+.env
+
+# assets
+src/public/*
