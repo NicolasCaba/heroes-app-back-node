@@ -60,9 +60,9 @@ const createStorage = async (req, res) => {
  */
 const deleteStorage = async (req, res) => {
   try {
-    const req = matchedData(req);
+    req = matchedData(req);
     const { mongoid } = req;
-    const response = await storageModel.findOneAndDelete(mongoid);
+    const response = await storageModel.findByIdAndDelete(mongoid);
     res.status(200).send({ message: 'Storage eliminado correctamente', response });
   } catch (error) {
     handleHttpError(res, { error, message: 'Cannot delete Storage by id' });

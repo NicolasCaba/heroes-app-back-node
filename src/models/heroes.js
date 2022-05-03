@@ -47,11 +47,55 @@ HeroesSchema.statics.findAllData = function () {
   return joinData;
 }
 
+HeroesSchema.statics.findAllDataByName = function (nameRegEx) {
+  const joinData = this.aggregate([
+    {
+      $match: {
+        superhero: { $regex: nameRegEx, $options: 'i' }
+      }
+    },
+    {
+      $lookup: {
+        from: 'storages',
+        localField: 'image_id',
+        foreignField: '_id',
+        as: 'image',
+      },
+    },
+    {
+      $unwind: '$image'
+    }
+  ]);
+  return joinData;
+}
+
 HeroesSchema.statics.findOneData = function (id) {
   const joinData = this.aggregate([
     {
       $match: {
         _id: mongoose.Types.ObjectId(id)
+      },
+    },
+    {
+      $lookup: {
+        from: 'storages',
+        localField: 'image_id',
+        foreignField: '_id',
+        as: 'image',
+      },
+    },
+    {
+      $unwind: '$image'
+    },
+  ]);
+  return joinData;
+}
+
+HeroesSchema.statics.findOneDataByName = function (name) {
+  const joinData = this.aggregate([
+    {
+      $match: {
+        id: name
       },
     },
     {

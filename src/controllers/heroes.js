@@ -9,8 +9,23 @@ const { handleHttpError } = require('./../utils/handleErrors');
  */
 const getHeroes = async (req, res) => {
   try {
-    const heroes = await heroesModel.findAllData({});
-    res.status(200).send(heroes);
+    const { _limit } = req.query;
+
+    if(req.query.q) {
+      const nameRegEx = new RegExp(req.query.q); 
+      let heroes = await heroesModel.findAllDataByName(nameRegEx);
+
+      heroes = heroes.slice(0, _limit);
+      
+      res.status(200).send(heroes);
+    } else {
+      let heroes = await heroesModel.findAllData();
+      
+      heroes = heroes.slice(0, _limit);
+      
+      res.status(200).send(heroes);
+    }
+
   } catch (error) {
     handleHttpError(res, { error, message: 'Cannot get Heroes' });
   }
@@ -29,6 +44,22 @@ const getHeroe = async (req, res) => {
     res.status(200).send(heroe);
   } catch (error) {
     handleHttpError(res, { error, message: 'Cannot get Heroe by id' });
+  }
+}
+
+/**
+ * GET Get heroe by name
+ * @param {*} req 
+ * @param {*} res 
+ */
+const getHeroeByName = async (req, res) => {
+  try {
+    req = matchedData(req);
+    const { name } = req;
+    const heroe = await heroesModel.findOneDataByName(name);
+    res.status(200).send(heroe);
+  } catch (error) {
+    handleHttpError(res, { error, message: 'Cannot get Heroe by name' });
   }
 }
 
@@ -58,7 +89,7 @@ const createHeroe = async (req, res) => {
 const updateHeroe = async (req, res) => {
   try {
     const { mongoid, ...body } = matchedData(req);
-    const response = await heroesModel.findOneAndUpdate(mongoid, body);
+    const response = await heroesModel.findByIdAndUpdate(mongoid, body);
     res.status(200).send({ message: 'Heroe actualizado correctamente', response });
   } catch (error) {
     handleHttpError(res, { error, message: 'Cannot update Heroe' });
@@ -81,4 +112,4 @@ const deleteHeroe = async (req, res) => {
   }
 }
 
-module.exports = { getHeroes, getHeroe, createHeroe, updateHeroe, deleteHeroe };
+module.exports = { getHeroes, getHeroe, getHeroeByName, createHeroe, updateHeroe, deleteHeroe };
